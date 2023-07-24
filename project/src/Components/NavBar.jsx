@@ -1,5 +1,6 @@
 import React from "react";
 import { Link as RouteLink } from "react-router-dom";
+import { FaGlobe } from 'react-icons/fa';
 import {
   Box,
   Flex,
@@ -23,6 +24,8 @@ import {
   ChevronRightIcon,
 } from "@chakra-ui/icons";
 import Logo from "../../src/assets/QuickLoanLogo.png"
+import { useDispatch, useSelector } from "react-redux";
+import { Logout } from "../redux/AuthReducer/action";
 
 const NAV_ITEMS = [
   {
@@ -42,10 +45,6 @@ const NAV_ITEMS = [
     href: "/loanApplicationPage",
   },
   {
-    label: "Support",
-    href: "/support",
-  },
-  {
     label: "Login",
     href: "/login",
   },
@@ -53,6 +52,11 @@ const NAV_ITEMS = [
     label: "Register",
     href: "/register",
   },
+  {
+    label: "Logout",
+    href: "/login",
+  },
+
 ];
 
 const DesktopNav = () => {
@@ -60,26 +64,48 @@ const DesktopNav = () => {
   const linkHoverColor = useColorModeValue("gray.800", "white");
   const popoverContentBgColor = useColorModeValue("white", "gray.800");
   const { isOpen, onClose } = useDisclosure();
-
+  const dispatch=useDispatch()
+  const isAuth = useSelector(store => store.AuthReducer.isAuth);
   return (
     <Stack direction={"row"} spacing={4}>
       {NAV_ITEMS.map((navItem) => (
-        <Box key={navItem.label}>
-          <Link
-            as={RouteLink}
-            to={navItem.href}
-            p={2}
-            fontSize={"md"}
-            fontWeight={500}
-            color={linkColor}
-            _hover={{
-              textDecoration: "none",
-              color: linkHoverColor,
-            }}
-          >
-            {navItem.label}
-          </Link>
-        </Box>
+         [isAuth && (navItem.label !== "Login" && navItem.label !== "Register")?
+             <Box key={navItem.label}>
+         <Link
+           as={RouteLink}
+           to={navItem.href}
+           p={2}
+           fontSize={"md"}
+           fontWeight={500}
+           color={linkColor}
+           onClick={()=>[navItem.label=="Logout"?dispatch(Logout):""]}
+           _hover={{
+             textDecoration: "none",
+             color: linkHoverColor,
+           }}
+         >
+           {navItem.label}
+         </Link>
+       </Box>
+         :  [!isAuth && navItem.label !== "Logout"? 
+         <Box key={navItem.label}>
+         <Link
+           as={RouteLink}
+           to={navItem.href}
+           p={2}
+           fontSize={"md"}
+           fontWeight={500}
+           color={linkColor}
+           onClick={()=>console.log("logout")}
+           _hover={{
+             textDecoration: "none",
+             color: linkHoverColor,
+           }}
+         >
+           {navItem.label}
+         </Link>
+       </Box>:""]]
+   
       ))}
     </Stack>
   );
@@ -181,7 +207,8 @@ const Navbar = () => {
           variant={"ghost"}
         />
         <Link as={RouteLink} to={"/"}>
-          <img src={Logo} alt="Logo" style={{ height: "40px" }} />
+          <Button ><FaGlobe size={30} color="white"/> Quick Loan</Button>
+          {/* <img src={Logo} alt="Logo" style={{ height: "40px" }} /> */}
         </Link>
         <Box display={{ base: "none", md: "flex" }} alignItems={"center"}>
           <DesktopNav />
